@@ -9,8 +9,11 @@ let score = 0;
 let lastPaintTme = 0;
 let snakeArr = [
   {x: 13 , y: 15}
-]
-let food = {x: 6, y: 7}
+];
+let food = {x: 6, y: 7};
+let highScore;
+let highScoreValue
+
 
 // Game Functions
 function main(ctime) {
@@ -44,25 +47,40 @@ function gameEngine() {
     moveSound.pause();
     inputDir = {x: 0, y: 0};
     alert("Game Over");
+    score = 0;
+    scoreBox.innerHTML = "Score: " + score;
     snakeArr = [{x: 13 , y:15}];
     musicSound.play()
-    score = 0;
+    
   }
+
+
   // Food eaten, increment the score and reproduce food
   if(snakeArr[0].y === food.y && snakeArr[0].x === food.x){
     foodSound.play();
+    score +=1;
+    if(score > highScore){
+      highScore = score;
+      localStorage.setItem("highScore", JSON.stringify(highScore));
+      highScoreBox.innerHTML = "High Score: "+ highScore;
+    }
+    scoreBox.innerHTML = "Score: " + score;
     snakeArr.unshift({x: snakeArr[0].x + inputDir.x, y: snakeArr[0].y + inputDir.y})
     let a = 2;
     let b = 16;
     food = {x: Math.round(a+ (b-a)* Math.random()), y: Math.round(a+ (b-a)* Math.random())}
   }
+
+
   //Moving Snake
   for(let i= snakeArr.length -2; i>=0; i--){
     snakeArr[i+1] = {...snakeArr[i]};
   }
   snakeArr[0].x += inputDir.x;
   snakeArr[0].y += inputDir.y;
-  // Display the snake & foo
+
+
+  // Display the snake & food
   board.innerHTML = "";
   snakeArr.forEach((e, index) => {
     snakeElement = document.createElement('div');
@@ -75,6 +93,8 @@ function gameEngine() {
     }
     board.appendChild(snakeElement);
   });
+
+
   // Display Food
   foodElement = document.createElement('div');
   foodElement.style.gridRowStart = food.y;
@@ -88,6 +108,16 @@ function gameEngine() {
 
 
 // Logic Starts here
+highScore = localStorage.getItem("highScore");
+if(highScore === null){
+  highScoreValue = 0;
+  localStorage.setItem("highScore",JSON.stringify(highScoreValue));
+}
+else{
+  highScoreValue = JSON.parse(highScore);
+  highScoreBox.innerHTML = "High Score: "+ highScoreValue;
+}
+
  window.requestAnimationFrame(main);
  window.addEventListener('keydown',e =>{
   inputDir = {x: 0, y: 1} //Start the Game
